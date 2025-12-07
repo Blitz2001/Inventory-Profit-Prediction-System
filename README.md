@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💎 Inventory & Profit Prediction System
 
-## Getting Started
+A modern, glassmorphism-styled ERP system tailored for Gem trading. This application allows users to track inventory, predict profits, manage sales, and maintain audit logs with a high-end visual experience.
 
-First, run the development server:
+![Dashboard Preview](https://i.imgur.com/example-dashboard-preview.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+-   **🎨 Glassmorphism UI:** Vibrant, high-end design with blurred overlays, gradients, and **3D floating gem animations**.
+-   **📦 Inventory Management:** comprehensive tracking of gem details (Weight, Shape, Processing Expenses, etc.).
+-   **💰 Profit Prediction:** Real-time calculation of estimated profit based on buying price, processing costs, and market value.
+-   **🔍 Smart Search:** Instant filtering by "Lot Number" (e.g., L001) or "Gem Type" (e.g., Sapphire).
+-   **📱 Mobile-First:** Fully responsive "Card Grid" layout that replaces traditional tables on smaller screens.
+-   **📝 Audit Logs:** Automatic tracking of every change made to inventory items for specialized accountability.
+-   **🔒 Secure Auth:** Integrated with Supabase Authentication.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-   **Framework:** [Next.js 14+](https://nextjs.org/) (App Directory)
+-   **Language:** TypeScript
+-   **Styling:** Tailwind CSS + Custom CSS Variables
+-   **Database & Auth:** [Supabase](https://supabase.com/)
+-   **Icons:** Lucide React
+-   **Deployment:** Vercel
 
-## Learn More
+## 🚀 Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+### Prerequisites
+-   Node.js 18+
+-   A Supabase project
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/Blitz2001/Inventory-Profit-Prediction-System.git
+    cd Inventory-Profit-Prediction-System
+    ```
 
-## Deploy on Vercel
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3.  **Environment Setup:**
+    Create a `.env.local` file in the root directory:
+    ```env
+    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4.  **Run Development Server:**
+    ```bash
+    npm run dev
+    ```
+    Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+## 📦 Database Schema
+
+The core `inventory` table requires the following key columns (see `types/index.ts` for full definition):
+-   `gem_type` (text)
+-   `lot_number` (int)
+-   `weight_ct` (float)
+-   `buying_price` (float)
+-   `predict_total_cost_lkr` (float) - *Labeled as "Processing Expenses"*
+-   `predict_val_per_ct_lkr` (float)
+-   `status` (text) - ('In Stock', 'Sold', 'Memo', 'Cutting')
+
+## 🌍 Deployment
+
+This project is optimized for deployment on **Vercel**.
+
+1.  Push your code to GitHub.
+2.  Import the project into Vercel.
+3.  Add the `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` environment variables.
+4.  Deploy!
+
+## 📄 License
+
+This project is private and proprietary.
