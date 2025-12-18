@@ -42,3 +42,22 @@ export type Transaction = {
     amount: number;
     type: 'Expense' | 'Income' | 'Investment';
 };
+
+export type Profile = {
+    id: string; // matches auth.users id
+    role: 'admin' | 'viewer';
+    full_name?: string;
+    created_at?: string;
+};
+
+export type CapitalInvestment = {
+    id: string;
+    investor_id: string; // Profile ID
+    amount: number;
+    investment_date: string; // ISO Date
+    note?: string;
+    created_at?: string;
+
+    // Joined data (optional)
+    profiles?: Profile;
+};

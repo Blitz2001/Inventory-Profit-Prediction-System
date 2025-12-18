@@ -14,8 +14,13 @@ import Link from "next/link"
 
 export default function AddPaymentPage() {
     const router = useRouter()
-    const { user } = useAuth()
+    const { user, isAdmin, loading: authLoading } = useAuth()
     const [loading, setLoading] = useState(false)
+
+    // Admin Guard
+    if (!authLoading && !isAdmin) {
+        router.push('/payments') // or home
+    }
 
     const [formData, setFormData] = useState({
         person: '',

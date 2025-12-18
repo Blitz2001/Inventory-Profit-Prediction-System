@@ -17,11 +17,18 @@ import { logChanges } from "@/lib/logger"
 export default function EditGemPage() {
     const router = useRouter()
     const params = useParams()
-    const { user } = useAuth()
+    const { user, isAdmin, loading: authLoading } = useAuth()
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [initialData, setInitialData] = useState<any>(null)
+
+    // Admin Guard
+    useEffect(() => {
+        if (!authLoading && !isAdmin) {
+            router.push('/')
+        }
+    }, [authLoading, isAdmin, router])
 
     // Form State
     const [formData, setFormData] = useState({

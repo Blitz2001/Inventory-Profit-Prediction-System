@@ -7,7 +7,7 @@ import { columns } from "./inventory/columns"
 import { DataTable } from "@/components/data-table"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Plus, History, TrendingUp, LogOut } from "lucide-react"
+import { Plus, History, TrendingUp, LogOut, Wallet } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { useAuth } from "@/components/auth-provider"
@@ -16,7 +16,7 @@ import { InventoryCard } from "@/components/inventory-card"
 export default function Dashboard() {
   const [data, setData] = useState<InventoryItem[]>([])
   const [loading, setLoading] = useState(true)
-  const { user, signOut } = useAuth()
+  const { user, signOut, isAdmin } = useAuth()
 
   // Derived state for filters
   const [activeStock, setActiveStock] = useState<InventoryItem[]>([])
@@ -82,6 +82,13 @@ export default function Dashboard() {
               />
             </div>
 
+            <Link href="/capital" className="flex-1 sm:flex-none">
+              <Button variant="outline" className="glass text-white border-white/30 hover:glass-card w-full">
+                <Wallet className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Capital</span>
+                <span className="sm:hidden">Cap</span>
+              </Button>
+            </Link>
             <Link href="/logs" className="flex-1 sm:flex-none">
               <Button variant="outline" className="glass text-white border-white/30 hover:glass-card w-full">
                 <History className="w-4 h-4 mr-2" />
@@ -89,13 +96,17 @@ export default function Dashboard() {
                 <span className="sm:hidden">Logs</span>
               </Button>
             </Link>
-            <Link href="/add" className="flex-1 sm:flex-none">
-              <Button className="glass-card text-white border-white/30 hover:bg-white/20 w-full">
-                <Plus className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Add New Stock</span>
-                <span className="sm:hidden">Add</span>
-              </Button>
-            </Link>
+            {user && (
+              isAdmin && (
+                <Link href="/add" className="flex-1 sm:flex-none">
+                  <Button className="glass-card text-white border-white/30 hover:bg-white/20 w-full">
+                    <Plus className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">Add New Stock</span>
+                    <span className="sm:hidden">Add</span>
+                  </Button>
+                </Link>
+              )
+            )}
             {user && (
               <Button
                 variant="outline"

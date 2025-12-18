@@ -4,6 +4,22 @@ import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
 import { InventoryItem } from "@/types"
 import { Badge } from "@/components/ui/badge"
+import { useAuth } from "@/components/auth-provider"
+
+const GemNameCell = ({ row }: { row: any }) => {
+    const { isAdmin } = useAuth() // Now we can use hooks!
+    const gemType = row.getValue("gem_type") as string
+    const id = row.original.id
+
+    if (isAdmin) {
+        return (
+            <Link href={`/edit/${id}`} className="font-medium text-blue-600 hover:underline hover:text-blue-800">
+                {gemType}
+            </Link>
+        )
+    }
+    return <span className="font-medium text-slate-700">{gemType}</span>
+}
 
 export const columns: ColumnDef<InventoryItem>[] = [
     {
@@ -36,11 +52,7 @@ export const columns: ColumnDef<InventoryItem>[] = [
     {
         accessorKey: "gem_type",
         header: "Gem",
-        cell: ({ row }) => (
-            <Link href={`/edit/${row.original.id}`} className="font-medium text-blue-600 hover:underline hover:text-blue-800">
-                {row.getValue("gem_type")}
-            </Link>
-        ),
+        cell: ({ row }) => <GemNameCell row={row} />,
     },
     {
         accessorKey: "lot_type",

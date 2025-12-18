@@ -16,8 +16,13 @@ import { logChanges } from "@/lib/logger"
 
 export default function AddGemPage() {
     const router = useRouter()
-    const { user } = useAuth()
+    const { user, isAdmin, loading: authLoading } = useAuth()
     const [loading, setLoading] = useState(false)
+
+    // Admin Guard
+    if (!authLoading && !isAdmin) {
+        router.push('/')
+    }
 
     // Form State
     const [formData, setFormData] = useState({
