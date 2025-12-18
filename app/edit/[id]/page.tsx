@@ -428,7 +428,7 @@ export default function EditGemPage() {
                                         </div>
                                         <Input
                                             type="number"
-                                            className="pl-10 h-12 text-lg bg-yellow-950/30 border-yellow-500/30 text-white placeholder:text-yellow-400/30 focus:bg-yellow-950/50 transition-all font-mono"
+                                            className="pl-10 h-12 text-lg bg-yellow-950/30 border-yellow-500/30 text-white placeholder:text-white/50 focus:bg-yellow-950/50 transition-all font-mono"
                                             placeholder="0.00"
                                             value={formData.predict_val_per_ct}
                                             onChange={(e) => setFormData({ ...formData, predict_val_per_ct: e.target.value })}
@@ -458,7 +458,7 @@ export default function EditGemPage() {
                                             <Label className="text-[10px] text-yellow-300/50 uppercase font-bold tracking-wider group-hover:text-yellow-300 transition-colors">Cut</Label>
                                             <Input
                                                 type="number"
-                                                className="bg-yellow-950/30 border-yellow-500/20 text-white placeholder:text-white/5 text-sm h-10 focus:border-yellow-400/50"
+                                                className="bg-yellow-950/30 border-yellow-500/20 text-white placeholder:text-white/40 text-sm h-10 focus:border-yellow-400/50"
                                                 placeholder="0"
                                                 value={formData.cost_cut}
                                                 onChange={(e) => setFormData({ ...formData, cost_cut: e.target.value })}
@@ -468,7 +468,7 @@ export default function EditGemPage() {
                                             <Label className="text-[10px] text-yellow-300/50 uppercase font-bold tracking-wider group-hover:text-yellow-300 transition-colors">Polish</Label>
                                             <Input
                                                 type="number"
-                                                className="bg-yellow-950/30 border-yellow-500/20 text-white placeholder:text-white/5 text-sm h-10 focus:border-yellow-400/50"
+                                                className="bg-yellow-950/30 border-yellow-500/20 text-white placeholder:text-white/40 text-sm h-10 focus:border-yellow-400/50"
                                                 placeholder="0"
                                                 value={formData.cost_polish}
                                                 onChange={(e) => setFormData({ ...formData, cost_polish: e.target.value })}
@@ -478,7 +478,7 @@ export default function EditGemPage() {
                                             <Label className="text-[10px] text-yellow-300/50 uppercase font-bold tracking-wider group-hover:text-yellow-300 transition-colors">Burn</Label>
                                             <Input
                                                 type="number"
-                                                className="bg-yellow-950/30 border-yellow-500/20 text-white placeholder:text-white/5 text-sm h-10 focus:border-yellow-400/50"
+                                                className="bg-yellow-950/30 border-yellow-500/20 text-white placeholder:text-white/40 text-sm h-10 focus:border-yellow-400/50"
                                                 placeholder="0"
                                                 value={formData.cost_burn}
                                                 onChange={(e) => setFormData({ ...formData, cost_burn: e.target.value })}
