@@ -29,7 +29,7 @@ export default function CapitalPage() {
             .from('capital_investments')
             .select(`
                 *,
-                profiles (full_name, email)
+                profiles (id, full_name, role)
             `)
             .order('investment_date', { ascending: false })
 
@@ -178,7 +178,7 @@ export default function CapitalPage() {
                                             </div>
                                             <div>
                                                 <p className="text-white font-medium">{(inv as any).profiles?.full_name || 'Unknown Investor'}</p>
-                                                <p className="text-white/50 text-xs">{(inv as any).profiles?.email}</p>
+                                                <p className="text-white/50 text-xs text-emerald-100/50">{(inv as any).profiles?.role?.toUpperCase()}</p>
                                                 <p className="text-white/40 text-[10px] mt-1">{new Date(inv.investment_date).toLocaleDateString()}</p>
                                             </div>
                                         </div>

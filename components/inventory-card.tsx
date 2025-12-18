@@ -15,12 +15,15 @@ import {
     DialogClose,
 } from "@/components/ui/dialog"
 
+import { useAuth } from "@/components/auth-provider"
+
 interface InventoryCardProps {
     item: InventoryItem
     priority?: boolean
 }
 
 export function InventoryCard({ item, priority = false }: InventoryCardProps) {
+    const { isAdmin } = useAuth()
     const totalValue = (item.weight_ct || 0) * (item.predict_val_per_ct_lkr || 0)
     const profit = totalValue - ((item.buying_price || 0) + (item.predict_total_cost_lkr || 0))
     const hasImage = item.image_urls && item.image_urls.length > 0
@@ -192,28 +195,32 @@ export function InventoryCard({ item, priority = false }: InventoryCardProps) {
                                         </div>
 
                                         <div className="pt-4 flex justify-end">
-                                            <Link href={`/edit/${item.id}`} className="w-full">
-                                                <Button className="w-full bg-white text-indigo-950 font-bold hover:bg-white/90">
-                                                    <Edit className="w-4 h-4 mr-2" />
-                                                    Edit Full Details
-                                                </Button>
-                                            </Link>
+                                            {isAdmin && (
+                                                <Link href={`/edit/${item.id}`} className="w-full">
+                                                    <Button className="w-full bg-white text-indigo-950 font-bold hover:bg-white/90">
+                                                        <Edit className="w-4 h-4 mr-2" />
+                                                        Edit Full Details
+                                                    </Button>
+                                                </Link>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             </DialogContent>
                         </Dialog>
 
-                        <Link href={`/edit/${item.id}`} className="flex-[3]">
-                            <Button
-                                size="sm"
-                                className="w-full glass hover:glass-card text-white border-white/20"
-                                variant="outline"
-                            >
-                                <Edit className="w-3 h-3 mr-1" />
-                                Edit
-                            </Button>
-                        </Link>
+                        {isAdmin && (
+                            <Link href={`/edit/${item.id}`} className="flex-[3]">
+                                <Button
+                                    size="sm"
+                                    className="w-full glass hover:glass-card text-white border-white/20"
+                                    variant="outline"
+                                >
+                                    <Edit className="w-3 h-3 mr-1" />
+                                    Edit
+                                </Button>
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
