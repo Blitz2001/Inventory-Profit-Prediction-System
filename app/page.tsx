@@ -7,7 +7,7 @@ import { columns } from "./inventory/columns"
 import { DataTable } from "@/components/data-table"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Plus, History, TrendingUp, LogOut, Wallet } from "lucide-react"
+import { Plus, History, TrendingUp, LogOut, Wallet, DollarSign } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { useAuth } from "@/components/auth-provider"
@@ -15,6 +15,7 @@ import { InventoryCard } from "@/components/inventory-card"
 
 export default function Dashboard() {
   const [data, setData] = useState<InventoryItem[]>([])
+  const [totalCapital, setTotalCapital] = useState(0)
   const [loading, setLoading] = useState(true)
   const { user, signOut, isAdmin } = useAuth()
 
@@ -29,6 +30,16 @@ export default function Dashboard() {
         .from('inventory')
         .select('*')
         .order('created_at', { ascending: false })
+
+      // Fetch Capital
+      const { data: capitalData, error: capitalError } = await supabase
+        .from('capital_investments')
+        .select('amount')
+
+      if (!capitalError && capitalData) {
+        const total = capitalData.reduce((sum, item) => sum + (item.amount || 0), 0)
+        setTotalCapital(total)
+      }
 
       if (error) console.error('Error fetching inventory:', error)
       else {
@@ -122,7 +133,16 @@ export default function Dashboard() {
       </div>
 
       {/* Metrics with Glassmorphism */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 sm:mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
+        <div className="glass-card rounded-xl p-4 sm:p-6 transition-glass">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm text-white/70 font-medium">Total Capital</p>
+            <DollarSign className="w-5 h-5 text-white/50" />
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold text-white">
+            Rs {totalCapital.toLocaleString()}
+          </p>
+        </div>
         <div className="glass-card rounded-xl p-4 sm:p-6 transition-glass">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-white/70 font-medium">Total Active Value</p>
@@ -143,7 +163,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="glass-card rounded-xl p-4 sm:p-6 transition-glass sm:col-span-2 lg:col-span-1">
+        <div className="glass-card rounded-xl p-4 sm:p-6 transition-glass">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-white/70 font-medium">Realized Profit</p>
             <TrendingUp className="w-5 h-5 text-blue-300" />
