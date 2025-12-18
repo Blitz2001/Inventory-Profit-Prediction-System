@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { TrendingUp, DollarSign, Wallet, ArrowLeft } from "lucide-react"
+import { TrendingUp, DollarSign, Wallet, ArrowLeft, Trash2 } from "lucide-react"
 
 export default function CapitalPage() {
     const router = useRouter()
@@ -81,6 +81,21 @@ export default function CapitalPage() {
             setNote('')
             setNickname('') // Reset nickname
             fetchData() // Refresh list
+        }
+    }
+
+    const handleDeleteInvestment = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this investment record?')) return
+
+        const { error } = await supabase
+            .from('capital_investments')
+            .delete()
+            .eq('id', id)
+
+        if (error) {
+            alert('Error deleting: ' + error.message)
+        } else {
+            fetchData()
         }
     }
 
@@ -216,6 +231,16 @@ export default function CapitalPage() {
                                                 + Rs {inv.amount.toLocaleString()}
                                             </p>
                                             {inv.note && <p className="text-white/40 text-xs">{inv.note}</p>}
+                                            {isAdmin && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6 text-red-400/50 hover:text-red-400 hover:bg-red-500/10 mt-1 ml-auto block"
+                                                    onClick={() => handleDeleteInvestment(inv.id)}
+                                                >
+                                                    <Trash2 className="w-3 h-3" />
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
                                 ))}

@@ -222,6 +222,26 @@ export default function EditGemPage() {
         }
     }
 
+    const handleDelete = async () => {
+        if (!confirm('Are you sure you want to delete this lot? This action cannot be undone and will delete all associated logs.')) return
+
+        setLoading(true)
+        try {
+            const { error } = await supabase
+                .from('inventory')
+                .delete()
+                .eq('id', params.id)
+
+            if (error) throw error
+
+            router.push('/')
+            router.refresh()
+        } catch (error: any) {
+            alert('Error deleting: ' + error.message)
+            setLoading(false)
+        }
+    }
+
     const addExtraCost = () => {
         if (!newCostLabel || !newCostAmount) return
         setExtraCosts([...extraCosts, { label: newCostLabel, amount: newCostAmount, type: 'Other' }])
@@ -260,6 +280,16 @@ export default function EditGemPage() {
                                 Mark as Sold
                             </Button>
                         )}
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="bg-red-500/10 text-red-400 hover:bg-red-500/20 border-red-500/30 w-full sm:w-auto"
+                            onClick={handleDelete}
+                        >
+                            <Trash2 className="w-4 h-4 sm:mr-2" />
+                            <span className="hidden sm:inline">Delete Lot</span>
+                        </Button>
                     </div>
                 </div>
                 <div className="p-6">
