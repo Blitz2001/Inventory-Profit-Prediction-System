@@ -77,9 +77,12 @@ export default function AddGemPage() {
     })
 
     // Real-time Calculation
-    // Real-time Calculation
     useEffect(() => {
-        const weight = parseFloat(formData.weight_ct) || 0
+        const weightRough = parseFloat(formData.weight_ct) || 0
+        const weightPostCut = parseFloat(formData.weight_post_cut) || 0
+        // Use Post-Cut weight for value calc if available, else Rough
+        const effectiveWeightForValue = weightPostCut > 0 ? weightPostCut : weightRough
+
         const rate = parseFloat(formData.usd_rate) || 293
 
         let valPerCtInput = parseFloat(formData.predict_val_per_ct) || 0
@@ -94,15 +97,14 @@ export default function AddGemPage() {
 
         // Convert all to LKR for standardization
         let valPerCtLkr = valCurrency === 'LKR' ? valPerCtInput : valPerCtInput * rate
-        let buyingPriceLkr = buyingPriceInput // Assumed LKR based on UI label
+        let buyingPriceLkr = buyingPriceInput
 
-        // Costs are usually in LKR locally, but let's respect currency toggle if we want (simplifying to LKR for inputs as per previous code structure implies mixed, but let's stick to base logic)
-        // Actually, previous code had costCurrency toggle. Let volume costs follow that.
         const getCostInLkr = (val: number) => costCurrency === 'LKR' ? val : val * rate
 
         let expensesLkr = getCostInLkr(costCutInput + costPolishInput + costBurnInput + extraCostsTotal)
 
-        const totalValueLkr = weight * valPerCtLkr
+        // Calculate Total Value based on Effective Weight
+        const totalValueLkr = effectiveWeightForValue * valPerCtLkr
         const totalCostLkr = buyingPriceLkr + expensesLkr
         const profitLkr = totalValueLkr - totalCostLkr
 
@@ -374,61 +376,77 @@ export default function AddGemPage() {
                                             </TabsList>
                                         </Tabs>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        <Input
-                                            type="number"
-                                            className="bg-white/5 border-indigo-500/30 text-white placeholder:text-white/20 text-xs px-2"
-                                            placeholder="Cut Cost"
-                                            title="Cutting Cost"
-                                            value={formData.cost_cut}
-                                            onChange={(e) => setFormData({ ...formData, cost_cut: e.target.value })}
-                                        />
-                                        <Input
-                                            type="number"
-                                            className="bg-white/5 border-indigo-500/30 text-white placeholder:text-white/20 text-xs px-2"
-                                            placeholder="Polish Cost"
-                                            title="Polishing Cost"
-                                            value={formData.cost_polish}
-                                            onChange={(e) => setFormData({ ...formData, cost_polish: e.target.value })}
-                                        />
-                                        <Input
-                                            type="number"
-                                            className="bg-white/5 border-indigo-500/30 text-white placeholder:text-white/20 text-xs px-2"
-                                            placeholder="Burn Cost"
-                                            title="Burning Cost"
-                                            value={formData.cost_burn}
-                                            onChange={(e) => setFormData({ ...formData, cost_burn: e.target.value })}
-                                        />
+                                    {/* Detailed Expenses Grid */}
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <div className="space-y-1.5">
+                                            <Label className="text-[10px] text-indigo-200/50 uppercase font-semibold tracking-wider">Cut</Label>
+                                            <Input
+                                                type="number"
+                                                className="bg-white/5 border-indigo-500/30 text-white placeholder:text-white/10 text-xs h-8"
+                                                placeholder="0.00"
+                                                value={formData.cost_cut}
+                                                onChange={(e) => setFormData({ ...formData, cost_cut: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <Label className="text-[10px] text-indigo-200/50 uppercase font-semibold tracking-wider">Polish</Label>
+                                            <Input
+                                                type="number"
+                                                className="bg-white/5 border-indigo-500/30 text-white placeholder:text-white/10 text-xs h-8"
+                                                placeholder="0.00"
+                                                value={formData.cost_polish}
+                                                onChange={(e) => setFormData({ ...formData, cost_polish: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <Label className="text-[10px] text-indigo-200/50 uppercase font-semibold tracking-wider">Burn</Label>
+                                            <Input
+                                                type="number"
+                                                className="bg-white/5 border-indigo-500/30 text-white placeholder:text-white/10 text-xs h-8"
+                                                placeholder="0.00"
+                                                value={formData.cost_burn}
+                                                onChange={(e) => setFormData({ ...formData, cost_burn: e.target.value })}
+                                            />
+                                        </div>
                                     </div>
 
                                     {/* Extra Costs List */}
-                                    <div className="mt-4 space-y-2">
-                                        <Label className="text-[10px] text-white/50 uppercase">Additional Costs (Transport, etc.)</Label>
-                                        {extraCosts.map((cost, idx) => (
-                                            <div key={idx} className="flex items-center gap-2 text-xs bg-white/5 p-1.5 rounded border border-white/5">
-                                                <span className="text-white/70 flex-1">{cost.label}</span>
-                                                <span className="text-white font-mono">{cost.amount}</span>
-                                                <Button type="button" variant="ghost" size="icon" className="h-4 w-4 text-red-400 hover:text-red-300" onClick={() => removeExtraCost(idx)}>
-                                                    <Trash2 className="w-3 h-3" />
-                                                </Button>
-                                            </div>
-                                        ))}
+                                    <div className="mt-4 pt-3 border-t border-white/5 space-y-3">
+                                        <Label className="text-[10px] text-white/50 uppercase tracking-wider block mb-2">Additional Costs</Label>
 
-                                        <div className="flex gap-2">
-                                            <Input
-                                                placeholder="Cost Label"
-                                                className="h-7 text-xs bg-white/5 border-white/10 text-white"
-                                                value={newCostLabel}
-                                                onChange={e => setNewCostLabel(e.target.value)}
-                                            />
-                                            <Input
-                                                type="number"
-                                                placeholder="Amount"
-                                                className="h-7 w-20 text-xs bg-white/5 border-white/10 text-white"
-                                                value={newCostAmount}
-                                                onChange={e => setNewCostAmount(e.target.value)}
-                                            />
-                                            <Button type="button" size="icon" className="h-7 w-7 bg-indigo-500 hover:bg-indigo-600" onClick={addExtraCost}>
+                                        {extraCosts.length > 0 && (
+                                            <div className="space-y-2 mb-3">
+                                                {extraCosts.map((cost, idx) => (
+                                                    <div key={idx} className="flex items-center gap-2 text-xs bg-white/5 p-2 rounded-md border border-white/5 group hover:border-white/10 transition-colors">
+                                                        <span className="text-white/70 flex-1 font-medium pl-1">{cost.label}</span>
+                                                        <span className="text-white font-mono bg-black/20 px-2 py-0.5 rounded text-[10px] text-right min-w-[60px]">{cost.amount}</span>
+                                                        <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-white/20 hover:text-red-400 -mr-1" onClick={() => removeExtraCost(idx)}>
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        <div className="flex gap-2 items-end bg-black/20 p-2 rounded-lg border border-white/5">
+                                            <div className="grid flex-1 gap-1.5">
+                                                <Input
+                                                    placeholder="e.g. Transport"
+                                                    className="h-8 text-xs bg-white/5 border-white/10 text-white focus:bg-white/10"
+                                                    value={newCostLabel}
+                                                    onChange={e => setNewCostLabel(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="grid w-24 gap-1.5">
+                                                <Input
+                                                    type="number"
+                                                    placeholder="Amount"
+                                                    className="h-8 text-xs bg-white/5 border-white/10 text-white focus:bg-white/10 text-right"
+                                                    value={newCostAmount}
+                                                    onChange={e => setNewCostAmount(e.target.value)}
+                                                />
+                                            </div>
+                                            <Button type="button" size="icon" className="h-8 w-8 shrink-0 bg-indigo-500 hover:bg-indigo-600 shadow-lg shadow-indigo-500/20" onClick={addExtraCost}>
                                                 <Plus className="w-4 h-4" />
                                             </Button>
                                         </div>
