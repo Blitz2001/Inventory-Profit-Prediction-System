@@ -63,7 +63,7 @@ export default function EditGemPage() {
     const [newCostAmount, setNewCostAmount] = useState('')
 
     // Currencies
-    const [valCurrency, setValCurrency] = useState<'LKR' | 'USD'>('USD')
+    const [valCurrency, setValCurrency] = useState<'LKR' | 'USD'>('LKR')
     const [costCurrency, setCostCurrency] = useState<'LKR' | 'USD'>('LKR')
 
     const [imgUrl, setImgUrl] = useState<string | null>(null)
@@ -394,7 +394,7 @@ export default function EditGemPage() {
                                     </div>
                                     <div className="relative group">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span className="text-yellow-400 font-bold text-lg">{valCurrency === 'USD' ? '$' : 'Rs'}</span>
+                                            <span key={valCurrency} className="text-yellow-400 font-bold text-lg">{valCurrency === 'USD' ? '$' : 'Rs'}</span>
                                         </div>
                                         <Input
                                             type="number"
