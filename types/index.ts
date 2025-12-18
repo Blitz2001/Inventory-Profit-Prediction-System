@@ -56,6 +56,7 @@ export type CapitalInvestment = {
     amount: number;
     investment_date: string; // ISO Date
     note?: string;
+    nickname?: string;
     created_at?: string;
 
     // Joined data (optional)

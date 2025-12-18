@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { CapitalInvestment, Profile } from "@/types" // Ensure these are exported from types/index.ts
 import { useAuth } from "@/components/auth-provider"
@@ -9,9 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { TrendingUp, DollarSign, Wallet } from "lucide-react"
+import { TrendingUp, DollarSign, Wallet, ArrowLeft } from "lucide-react"
 
 export default function CapitalPage() {
+    const router = useRouter()
     const { isAdmin, user } = useAuth()
     const [investments, setInvestments] = useState<CapitalInvestment[]>([])
     const [profiles, setProfiles] = useState<Profile[]>([])
@@ -20,6 +22,7 @@ export default function CapitalPage() {
     // Form State
     const [amount, setAmount] = useState('')
     const [selectedInvestor, setSelectedInvestor] = useState('')
+    const [nickname, setNickname] = useState('') // New nickname state
     const [note, setNote] = useState('')
 
     const fetchData = async () => {
@@ -62,6 +65,7 @@ export default function CapitalPage() {
                 investor_id: selectedInvestor,
                 amount: parseFloat(amount),
                 note,
+                nickname, // Insert nickname
                 created_by: user?.id
             })
 
@@ -70,6 +74,7 @@ export default function CapitalPage() {
         } else {
             setAmount('')
             setNote('')
+            setNickname('') // Reset nickname
             fetchData() // Refresh list
         }
     }
@@ -81,6 +86,14 @@ export default function CapitalPage() {
             {/* Header */}
             <div className="glass-header rounded-2xl p-6 mb-8 transition-glass">
                 <div className="flex items-center gap-4">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => router.back()}
+                        className="text-white/70 hover:text-white hover:bg-white/10"
+                    >
+                        <ArrowLeft className="w-6 h-6" />
+                    </Button>
                     <div className="p-3 glass-card rounded-full text-emerald-300">
                         <Wallet className="w-8 h-8" />
                     </div>
@@ -131,6 +144,16 @@ export default function CapitalPage() {
                                 </div>
 
                                 <div className="space-y-2">
+                                    <Label className="text-white">Nickname (Optional)</Label>
+                                    <Input
+                                        value={nickname}
+                                        onChange={e => setNickname(e.target.value)}
+                                        className="bg-white/5 border-white/20 text-white"
+                                        placeholder="e.g. John Doe (if different from profile)"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
                                     <Label className="text-white">Amount (LKR)</Label>
                                     <Input
                                         type="number"
@@ -177,7 +200,8 @@ export default function CapitalPage() {
                                                 {(inv as any).profiles?.full_name?.charAt(0) || '?'}
                                             </div>
                                             <div>
-                                                <p className="text-white font-medium">{(inv as any).profiles?.full_name || 'Unknown Investor'}</p>
+                                                <p className="text-white font-medium">{inv.nickname || (inv as any).profiles?.full_name || 'Unknown Investor'}</p>
+                                                {inv.nickname && <p className="text-white/50 text-xs text-emerald-100/50">Via: {(inv as any).profiles?.full_name}</p>}
                                                 <p className="text-white/50 text-xs text-emerald-100/50">{(inv as any).profiles?.role?.toUpperCase()}</p>
                                                 <p className="text-white/40 text-[10px] mt-1">{new Date(inv.investment_date).toLocaleDateString()}</p>
                                             </div>
