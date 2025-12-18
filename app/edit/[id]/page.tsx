@@ -13,6 +13,7 @@ import { Loader2, ArrowLeft, Save, Plus, Trash2, TrendingUp } from "lucide-react
 import Link from "next/link"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { logChanges } from "@/lib/logger"
+import { fetchUSDRate } from "@/lib/currency"
 
 export default function EditGemPage() {
     const router = useRouter()
@@ -112,7 +113,7 @@ export default function EditGemPage() {
                         : (data.predict_val_per_ct_lkr || 0)
                 ),
 
-                usd_rate: '293',
+                usd_rate: String(data.usd_rate || '293'), // Use stored rate, default to 293
                 status: data.status || 'In Stock',
                 note: ''
             })
@@ -129,6 +130,13 @@ export default function EditGemPage() {
                 setImgUrl(data.image_urls[0])
             }
             setLoading(false)
+
+            // Fetch live rate to update projection if needed
+            fetchUSDRate().then(rate => {
+                if (rate) {
+                    setFormData(prev => ({ ...prev, usd_rate: rate.toFixed(2) }))
+                }
+            })
         }
 
         fetchGem()

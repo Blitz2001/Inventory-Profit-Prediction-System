@@ -13,6 +13,7 @@ import { Loader2, Upload, ChevronLeft, Calculator, TrendingUp, Plus, Trash2 } fr
 import Link from "next/link"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { logChanges } from "@/lib/logger"
+import { fetchUSDRate } from "@/lib/currency"
 
 export default function AddGemPage() {
     const router = useRouter()
@@ -75,6 +76,18 @@ export default function AddGemPage() {
         amountCostUsd: 0,
         profitUsd: 0
     })
+
+    // Initial Load
+    useEffect(() => {
+        // Fetch Live USD Rate
+        const getRate = async () => {
+            const rate = await fetchUSDRate()
+            if (rate) {
+                setFormData(prev => ({ ...prev, usd_rate: rate.toFixed(2) }))
+            }
+        }
+        getRate()
+    }, [])
 
     // Real-time Calculation
     useEffect(() => {
