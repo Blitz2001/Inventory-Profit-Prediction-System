@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, ArrowLeft, Save, Plus, Trash2 } from "lucide-react"
+import { Loader2, ArrowLeft, Save, Plus, Trash2, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { logChanges } from "@/lib/logger"
@@ -369,109 +369,139 @@ export default function EditGemPage() {
                         <div className="space-y-4">
                             <h3 className="text-sm font-semibold text-white">Update Financials</h3>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-yellow-500/10 p-4 rounded-xl border border-yellow-500/20">
-                                {/* Input 1: Value Per Ct */}
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-center mb-1">
-                                        <Label className="text-yellow-200 text-xs font-bold uppercase">Val / Ct</Label>
+                            <div className="bg-yellow-900/10 p-5 rounded-xl border border-yellow-500/20 shadow-inner">
+                                {/* Section 1: Income Potential */}
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <Label className="text-yellow-200 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                                            <TrendingUp className="w-3.5 h-3.5" />
+                                            Predict Value / Ct
+                                        </Label>
                                         <Tabs value={valCurrency} onValueChange={(v) => setValCurrency(v as 'LKR' | 'USD')} className="h-6">
-                                            <TabsList className="h-6 p-0 bg-white/5 border border-white/10">
-                                                <TabsTrigger value="USD" className="h-full px-2 text-[10px] data-[state=active]:bg-yellow-500/40 text-white/50">USD</TabsTrigger>
-                                                <TabsTrigger value="LKR" className="h-full px-2 text-[10px] data-[state=active]:bg-yellow-500/40 text-white/50">LKR</TabsTrigger>
+                                            <TabsList className="h-6 p-0 bg-yellow-950/50 border border-yellow-500/30">
+                                                <TabsTrigger value="USD" className="h-full px-3 text-[10px] data-[state=active]:bg-yellow-500/50 data-[state=active]:text-white text-yellow-300">USD</TabsTrigger>
+                                                <TabsTrigger value="LKR" className="h-full px-3 text-[10px] data-[state=active]:bg-yellow-500/50 data-[state=active]:text-white text-yellow-300">LKR</TabsTrigger>
                                             </TabsList>
                                         </Tabs>
                                     </div>
-                                    <Input
-                                        type="number"
-                                        className="bg-white/5 border-yellow-500/30 text-white placeholder:text-white/20"
-                                        value={formData.predict_val_per_ct}
-                                        onChange={(e) => setFormData({ ...formData, predict_val_per_ct: e.target.value })}
-                                    />
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span className="text-yellow-400 font-bold text-lg">{valCurrency === 'USD' ? '$' : 'Rs'}</span>
+                                        </div>
+                                        <Input
+                                            type="number"
+                                            className="pl-10 h-12 text-lg bg-yellow-950/30 border-yellow-500/30 text-white placeholder:text-yellow-400/30 focus:bg-yellow-950/50 transition-all font-mono"
+                                            placeholder="0.00"
+                                            value={formData.predict_val_per_ct}
+                                            onChange={(e) => setFormData({ ...formData, predict_val_per_ct: e.target.value })}
+                                        />
+                                    </div>
                                 </div>
 
-                                {/* Input 2: Total Cost */}
-                                {/* Detailed Expenses */}
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-center mb-1">
-                                        <Label className="text-yellow-200 text-xs font-bold uppercase">Processing Expenses (Cut/Polish/Burn)</Label>
+                                {/* Divider */}
+                                <div className="my-6 border-t border-yellow-500/20 relative">
+                                    <span className="absolute left-1/2 -translate-x-1/2 -top-2 bg-[#2a1b00] px-2 text-[10px] text-yellow-400 font-mono">LESS EXPENSES</span>
+                                </div>
+
+                                {/* Section 2: Cost Breakdown */}
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <Label className="text-yellow-200 text-xs font-bold uppercase tracking-wider">Processing Costs</Label>
                                         <Tabs value={costCurrency} onValueChange={(v) => setCostCurrency(v as 'LKR' | 'USD')} className="h-6">
-                                            <TabsList className="h-6 p-0 bg-white/5 border border-white/10">
-                                                <TabsTrigger value="USD" className="h-full px-2 text-[10px] data-[state=active]:bg-yellow-500/40 text-white/50">USD</TabsTrigger>
-                                                <TabsTrigger value="LKR" className="h-full px-2 text-[10px] data-[state=active]:bg-yellow-500/40 text-white/50">LKR</TabsTrigger>
+                                            <TabsList className="h-6 p-0 bg-yellow-950/50 border border-yellow-500/30">
+                                                <TabsTrigger value="USD" className="h-full px-3 text-[10px] data-[state=active]:bg-yellow-500/50 data-[state=active]:text-white text-yellow-300">USD</TabsTrigger>
+                                                <TabsTrigger value="LKR" className="h-full px-3 text-[10px] data-[state=active]:bg-yellow-500/50 data-[state=active]:text-white text-yellow-300">LKR</TabsTrigger>
                                             </TabsList>
                                         </Tabs>
                                     </div>
-                                    {/* Detailed Expenses Grid */}
-                                    <div className="grid grid-cols-3 gap-3">
-                                        <div className="space-y-1.5">
-                                            <Label className="text-[10px] text-yellow-200/50 uppercase font-semibold tracking-wider">Cut</Label>
+
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <div className="space-y-1.5 group">
+                                            <Label className="text-[10px] text-yellow-300/50 uppercase font-bold tracking-wider group-hover:text-yellow-300 transition-colors">Cut</Label>
                                             <Input
                                                 type="number"
-                                                className="bg-white/5 border-yellow-500/30 text-white placeholder:text-white/10 text-xs h-8"
-                                                placeholder="0.00"
+                                                className="bg-yellow-950/30 border-yellow-500/20 text-white placeholder:text-white/5 text-sm h-10 focus:border-yellow-400/50"
+                                                placeholder="0"
                                                 value={formData.cost_cut}
                                                 onChange={(e) => setFormData({ ...formData, cost_cut: e.target.value })}
                                             />
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <Label className="text-[10px] text-yellow-200/50 uppercase font-semibold tracking-wider">Polish</Label>
+                                        <div className="space-y-1.5 group">
+                                            <Label className="text-[10px] text-yellow-300/50 uppercase font-bold tracking-wider group-hover:text-yellow-300 transition-colors">Polish</Label>
                                             <Input
                                                 type="number"
-                                                className="bg-white/5 border-yellow-500/30 text-white placeholder:text-white/10 text-xs h-8"
-                                                placeholder="0.00"
+                                                className="bg-yellow-950/30 border-yellow-500/20 text-white placeholder:text-white/5 text-sm h-10 focus:border-yellow-400/50"
+                                                placeholder="0"
                                                 value={formData.cost_polish}
                                                 onChange={(e) => setFormData({ ...formData, cost_polish: e.target.value })}
                                             />
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <Label className="text-[10px] text-yellow-200/50 uppercase font-semibold tracking-wider">Burn</Label>
+                                        <div className="space-y-1.5 group">
+                                            <Label className="text-[10px] text-yellow-300/50 uppercase font-bold tracking-wider group-hover:text-yellow-300 transition-colors">Burn</Label>
                                             <Input
                                                 type="number"
-                                                className="bg-white/5 border-yellow-500/30 text-white placeholder:text-white/10 text-xs h-8"
-                                                placeholder="0.00"
+                                                className="bg-yellow-950/30 border-yellow-500/20 text-white placeholder:text-white/5 text-sm h-10 focus:border-yellow-400/50"
+                                                placeholder="0"
                                                 value={formData.cost_burn}
                                                 onChange={(e) => setFormData({ ...formData, cost_burn: e.target.value })}
                                             />
                                         </div>
                                     </div>
 
-                                    {/* Extra Costs List */}
-                                    <div className="mt-4 pt-3 border-t border-white/5 space-y-3">
-                                        <Label className="text-[10px] text-white/50 uppercase tracking-wider block mb-2">Additional Costs</Label>
+                                    {/* Extra Costs */}
+                                    <div className="bg-yellow-950/30 rounded-lg p-3 border border-yellow-500/10 space-y-3 mt-4">
+                                        <div className="flex items-center justify-between">
+                                            <Label className="text-[10px] text-yellow-300/70 uppercase tracking-wider font-semibold">Other Expenses</Label>
+                                            <span className="text-[10px] text-yellow-400/50 font-mono">
+                                                Total: {extraCosts.reduce((a, b) => a + (parseFloat(b.amount) || 0), 0).toLocaleString()}
+                                            </span>
+                                        </div>
 
                                         {extraCosts.length > 0 && (
-                                            <div className="space-y-2 mb-3">
+                                            <div className="flex flex-wrap gap-2">
                                                 {extraCosts.map((cost, idx) => (
-                                                    <div key={idx} className="flex items-center gap-2 text-xs bg-white/5 p-2 rounded-md border border-white/5 group hover:border-white/10 transition-colors">
-                                                        <span className="text-white/70 flex-1 font-medium pl-1">{cost.label}</span>
-                                                        <span className="text-white font-mono bg-black/20 px-2 py-0.5 rounded text-[10px] text-right min-w-[60px]">{cost.amount}</span>
-                                                        <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-white/20 hover:text-red-400 -mr-1" onClick={() => removeExtraCost(idx)}>
-                                                            <Trash2 className="w-3.5 h-3.5" />
-                                                        </Button>
+                                                    <div key={idx} className="flex items-center gap-2 text-xs bg-yellow-500/10 text-yellow-200 px-3 py-1.5 rounded-full border border-yellow-500/20 animate-in fade-in zoom-in duration-200">
+                                                        <span className="font-medium">{cost.label}</span>
+                                                        <span className="w-px h-3 bg-yellow-500/30 mx-1"></span>
+                                                        <span className="font-mono text-white">{cost.amount}</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeExtraCost(idx)}
+                                                            className="ml-1 hover:text-red-400 transition-colors"
+                                                        >
+                                                            <Trash2 className="w-3 h-3" />
+                                                        </button>
                                                     </div>
                                                 ))}
                                             </div>
                                         )}
 
-                                        <div className="flex gap-2 items-end bg-black/20 p-2 rounded-lg border border-white/5">
-                                            <div className="grid flex-1 gap-1.5">
-                                                <Input
-                                                    placeholder="e.g. Transport"
-                                                    className="h-8 text-xs bg-white/5 border-white/10 text-white focus:bg-white/10"
-                                                    value={newCostLabel}
-                                                    onChange={e => setNewCostLabel(e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="grid w-24 gap-1.5">
-                                                <Input
-                                                    type="number"
-                                                    placeholder="Amount"
-                                                    className="h-8 text-xs bg-white/5 border-white/10 text-white focus:bg-white/10 text-right"
-                                                    value={newCostAmount}
-                                                    onChange={e => setNewCostAmount(e.target.value)}
-                                                />
-                                            </div>
-                                            <Button type="button" size="icon" className="h-8 w-8 shrink-0 bg-yellow-500/50 hover:bg-yellow-500/70 shadow-lg shadow-yellow-500/10" onClick={addExtraCost}>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                placeholder="Expense Name (e.g. Transport)"
+                                                className="h-9 text-xs bg-yellow-950/50 border-yellow-500/20 text-white focus:bg-yellow-900"
+                                                value={newCostLabel}
+                                                onChange={e => setNewCostLabel(e.target.value)}
+                                            />
+                                            <Input
+                                                type="number"
+                                                placeholder="Amount"
+                                                className="h-9 w-24 text-xs bg-yellow-950/50 border-yellow-500/20 text-white focus:bg-yellow-900 text-right font-mono"
+                                                value={newCostAmount}
+                                                onChange={e => setNewCostAmount(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault()
+                                                        addExtraCost()
+                                                    }
+                                                }}
+                                            />
+                                            <Button
+                                                type="button"
+                                                size="icon"
+                                                className="h-9 w-9 shrink-0 bg-yellow-600 hover:bg-yellow-500 text-white shadow-lg shadow-yellow-500/20"
+                                                onClick={addExtraCost}
+                                            >
                                                 <Plus className="w-4 h-4" />
                                             </Button>
                                         </div>
