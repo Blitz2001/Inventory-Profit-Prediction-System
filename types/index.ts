@@ -30,6 +30,13 @@ export type InventoryItem = {
     predict_val_per_ct_lkr?: number; // "Predicted value of a ct"
     predict_total_cost_lkr?: number; // "Processing Expenses" (Cut + Burn)
 
+    // Detailed Costs
+    weight_post_cut?: number;
+    cost_cut?: number;
+    cost_polish?: number;
+    cost_burn?: number;
+    extra_costs?: { label: string; amount: number; type: string }[];
+
     // Helpers (Optional, can be computed)
     image_urls?: string[];
 };

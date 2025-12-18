@@ -6,12 +6,13 @@ import { supabase } from "@/lib/supabase"
  */
 export async function logChanges(
     user: any,
-    gemId: string,
+    entityId: string,
     oldData: any,
     newData: any,
-    note: string = ''
+    note: string = '',
+    entityType: 'GEM' | 'CAPITAL' = 'GEM'
 ) {
-    if (!user || !gemId) return
+    if (!user || !entityId) return
 
     const entriesToInsert = []
 
@@ -20,7 +21,9 @@ export async function logChanges(
     const fieldsTracked = [
         'gem_type', 'weight_ct', 'status',
         'predict_val_per_ct_lkr', 'predict_total_cost_lkr', 'buying_price',
-        'budget_per_ct_usd', 'lot_type', 'treatment', 'shape'
+        'budget_per_ct_usd', 'lot_type', 'treatment', 'shape',
+        'weight_post_cut', 'cost_cut', 'cost_polish', 'cost_burn', 'extra_costs',
+        'amount', 'nickname' // Capital fields
     ]
 
     // Case A: Creation (No oldData)
@@ -28,7 +31,8 @@ export async function logChanges(
         entriesToInsert.push({
             user_id: user.id,
             email: user.email,
-            gem_id: gemId,
+            gem_id: entityType === 'GEM' ? entityId : null,
+            capital_id: entityType === 'CAPITAL' ? entityId : null,
             action_type: 'CREATE',
             field_changed: 'ALL',
             old_value: null,
@@ -46,7 +50,8 @@ export async function logChanges(
                 entriesToInsert.push({
                     user_id: user.id,
                     email: user.email,
-                    gem_id: gemId,
+                    gem_id: entityType === 'GEM' ? entityId : null,
+                    capital_id: entityType === 'CAPITAL' ? entityId : null,
                     action_type: 'UPDATE',
                     field_changed: field,
                     old_value: String(oldVal),

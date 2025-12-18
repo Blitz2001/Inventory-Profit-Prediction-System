@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Upload, ChevronLeft, Calculator, TrendingUp } from "lucide-react"
+import { Loader2, Upload, ChevronLeft, Calculator, TrendingUp, Plus, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { logChanges } from "@/lib/logger"
@@ -36,13 +36,24 @@ export default function AddGemPage() {
         number_of_pieces: '1',
         weight_ct: '',
 
+        // Detailed Costs
+        weight_post_cut: '',
+        cost_cut: '',
+        cost_polish: '',
+        cost_burn: '',
+
         predict_val_per_ct: '',
-        predict_total_cost: '',
+        // predict_total_cost removed from direct input, now calculated
         buying_price: '',
 
         usd_rate: '293',
         status: 'In Stock'
     })
+
+    // Dynamic Extra Costs
+    const [extraCosts, setExtraCosts] = useState<{ label: string; amount: string; type: string }[]>([])
+    const [newCostLabel, setNewCostLabel] = useState('')
+    const [newCostAmount, setNewCostAmount] = useState('')
 
     // Currencies
     const [valCurrency, setValCurrency] = useState<'LKR' | 'USD'>('USD')
@@ -66,17 +77,30 @@ export default function AddGemPage() {
     })
 
     // Real-time Calculation
+    // Real-time Calculation
     useEffect(() => {
         const weight = parseFloat(formData.weight_ct) || 0
         const rate = parseFloat(formData.usd_rate) || 293
 
         let valPerCtInput = parseFloat(formData.predict_val_per_ct) || 0
-        let expensesInput = parseFloat(formData.predict_total_cost) || 0
         let buyingPriceInput = parseFloat(formData.buying_price) || 0
 
+        // Detailed Costs
+        let costCutInput = parseFloat(formData.cost_cut) || 0
+        let costPolishInput = parseFloat(formData.cost_polish) || 0
+        let costBurnInput = parseFloat(formData.cost_burn) || 0
+
+        let extraCostsTotal = extraCosts.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0)
+
+        // Convert all to LKR for standardization
         let valPerCtLkr = valCurrency === 'LKR' ? valPerCtInput : valPerCtInput * rate
-        let expensesLkr = costCurrency === 'LKR' ? expensesInput : expensesInput * rate
-        let buyingPriceLkr = buyingPriceInput
+        let buyingPriceLkr = buyingPriceInput // Assumed LKR based on UI label
+
+        // Costs are usually in LKR locally, but let's respect currency toggle if we want (simplifying to LKR for inputs as per previous code structure implies mixed, but let's stick to base logic)
+        // Actually, previous code had costCurrency toggle. Let volume costs follow that.
+        const getCostInLkr = (val: number) => costCurrency === 'LKR' ? val : val * rate
+
+        let expensesLkr = getCostInLkr(costCutInput + costPolishInput + costBurnInput + extraCostsTotal)
 
         const totalValueLkr = weight * valPerCtLkr
         const totalCostLkr = buyingPriceLkr + expensesLkr
@@ -90,7 +114,7 @@ export default function AddGemPage() {
             amountCostUsd: expensesLkr / rate,
             profitUsd: profitLkr / rate
         })
-    }, [formData, valCurrency, costCurrency])
+    }, [formData, extraCosts, valCurrency, costCurrency])
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         try {
@@ -107,6 +131,17 @@ export default function AddGemPage() {
         } finally {
             setUploading(false)
         }
+    }
+
+    const addExtraCost = () => {
+        if (!newCostLabel || !newCostAmount) return
+        setExtraCosts([...extraCosts, { label: newCostLabel, amount: newCostAmount, type: 'Other' }])
+        setNewCostLabel('')
+        setNewCostAmount('')
+    }
+
+    const removeExtraCost = (index: number) => {
+        setExtraCosts(extraCosts.filter((_, i) => i !== index))
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -128,8 +163,15 @@ export default function AddGemPage() {
                     number_of_pieces: parseInt(formData.number_of_pieces) || 1,
                     weight_ct: parseFloat(formData.weight_ct),
 
+                    // Detailed Costs
+                    weight_post_cut: parseFloat(formData.weight_post_cut) || null,
+                    cost_cut: parseFloat(formData.cost_cut) || 0,
+                    cost_polish: parseFloat(formData.cost_polish) || 0,
+                    cost_burn: parseFloat(formData.cost_burn) || 0,
+                    extra_costs: extraCosts,
+
                     predict_val_per_ct_lkr: calculations.totalValueLkr / (parseFloat(formData.weight_ct) || 1),
-                    predict_total_cost_lkr: calculations.amountCostLkr,
+                    predict_total_cost_lkr: calculations.amountCostLkr, // Sum of all detailed costs
                     buying_price: parseFloat(formData.buying_price) || 0,
                     budget_per_ct_usd: calculations.amountCostUsd,
 
@@ -254,14 +296,26 @@ export default function AddGemPage() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-white/70">No. Pieces</Label>
+                                <Label className="text-white/70">Weight After Cut</Label>
                                 <Input
                                     type="number"
-                                    value={formData.number_of_pieces}
-                                    onChange={(e) => setFormData({ ...formData, number_of_pieces: e.target.value })}
+                                    step="0.01"
+                                    placeholder="Optional"
                                     className="bg-white/5 border-white/10 text-white placeholder:text-white/20"
+                                    value={formData.weight_post_cut}
+                                    onChange={(e) => setFormData({ ...formData, weight_post_cut: e.target.value })}
                                 />
                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-white/70">No. Pieces</Label>
+                            <Input
+                                type="number"
+                                value={formData.number_of_pieces}
+                                onChange={(e) => setFormData({ ...formData, number_of_pieces: e.target.value })}
+                                className="bg-white/5 border-white/10 text-white placeholder:text-white/20"
+                            />
                         </div>
 
                         <div className="h-px bg-white/10" />
@@ -309,9 +363,10 @@ export default function AddGemPage() {
                                 </div>
 
                                 {/* Input 2: Total Cost */}
+                                {/* Detailed Expenses */}
                                 <div className="space-y-2">
                                     <div className="flex justify-between items-center mb-1">
-                                        <Label className="text-indigo-200 text-xs font-bold uppercase">Processing Expenses (Cut & Burn)</Label>
+                                        <Label className="text-indigo-200 text-xs font-bold uppercase">Expenses</Label>
                                         <Tabs value={costCurrency} onValueChange={(v) => setCostCurrency(v as 'LKR' | 'USD')} className="h-6">
                                             <TabsList className="h-6 p-0 bg-white/5 border border-white/10">
                                                 <TabsTrigger value="USD" className="h-full px-2 text-[10px] data-[state=active]:bg-indigo-500 data-[state=active]:text-white text-white/50">USD</TabsTrigger>
@@ -319,13 +374,65 @@ export default function AddGemPage() {
                                             </TabsList>
                                         </Tabs>
                                     </div>
-                                    <Input
-                                        type="number"
-                                        className="bg-white/5 border-indigo-500/30 text-white placeholder:text-white/20"
-                                        placeholder="0.00"
-                                        value={formData.predict_total_cost}
-                                        onChange={(e) => setFormData({ ...formData, predict_total_cost: e.target.value })}
-                                    />
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <Input
+                                            type="number"
+                                            className="bg-white/5 border-indigo-500/30 text-white placeholder:text-white/20 text-xs px-2"
+                                            placeholder="Cut Cost"
+                                            title="Cutting Cost"
+                                            value={formData.cost_cut}
+                                            onChange={(e) => setFormData({ ...formData, cost_cut: e.target.value })}
+                                        />
+                                        <Input
+                                            type="number"
+                                            className="bg-white/5 border-indigo-500/30 text-white placeholder:text-white/20 text-xs px-2"
+                                            placeholder="Polish Cost"
+                                            title="Polishing Cost"
+                                            value={formData.cost_polish}
+                                            onChange={(e) => setFormData({ ...formData, cost_polish: e.target.value })}
+                                        />
+                                        <Input
+                                            type="number"
+                                            className="bg-white/5 border-indigo-500/30 text-white placeholder:text-white/20 text-xs px-2"
+                                            placeholder="Burn Cost"
+                                            title="Burning Cost"
+                                            value={formData.cost_burn}
+                                            onChange={(e) => setFormData({ ...formData, cost_burn: e.target.value })}
+                                        />
+                                    </div>
+
+                                    {/* Extra Costs List */}
+                                    <div className="mt-4 space-y-2">
+                                        <Label className="text-[10px] text-white/50 uppercase">Additional Costs (Transport, etc.)</Label>
+                                        {extraCosts.map((cost, idx) => (
+                                            <div key={idx} className="flex items-center gap-2 text-xs bg-white/5 p-1.5 rounded border border-white/5">
+                                                <span className="text-white/70 flex-1">{cost.label}</span>
+                                                <span className="text-white font-mono">{cost.amount}</span>
+                                                <Button type="button" variant="ghost" size="icon" className="h-4 w-4 text-red-400 hover:text-red-300" onClick={() => removeExtraCost(idx)}>
+                                                    <Trash2 className="w-3 h-3" />
+                                                </Button>
+                                            </div>
+                                        ))}
+
+                                        <div className="flex gap-2">
+                                            <Input
+                                                placeholder="Cost Label"
+                                                className="h-7 text-xs bg-white/5 border-white/10 text-white"
+                                                value={newCostLabel}
+                                                onChange={e => setNewCostLabel(e.target.value)}
+                                            />
+                                            <Input
+                                                type="number"
+                                                placeholder="Amount"
+                                                className="h-7 w-20 text-xs bg-white/5 border-white/10 text-white"
+                                                value={newCostAmount}
+                                                onChange={e => setNewCostAmount(e.target.value)}
+                                            />
+                                            <Button type="button" size="icon" className="h-7 w-7 bg-indigo-500 hover:bg-indigo-600" onClick={addExtraCost}>
+                                                <Plus className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

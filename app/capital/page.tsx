@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { CapitalInvestment, Profile } from "@/types" // Ensure these are exported from types/index.ts
 import { useAuth } from "@/components/auth-provider"
+import { logChanges } from "@/lib/logger"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -59,7 +60,7 @@ export default function CapitalPage() {
         e.preventDefault()
         if (!selectedInvestor || !amount) return
 
-        const { error } = await supabase
+        const { data: insertedData, error } = await supabase
             .from('capital_investments')
             .insert({
                 investor_id: selectedInvestor,
@@ -68,10 +69,14 @@ export default function CapitalPage() {
                 nickname, // Insert nickname
                 created_by: user?.id
             })
+            .select()
+            .single()
 
         if (error) {
             alert('Error adding investment: ' + error.message)
         } else {
+            await logChanges(user, insertedData.id, null, insertedData, "Capital Injection", 'CAPITAL')
+
             setAmount('')
             setNote('')
             setNickname('') // Reset nickname

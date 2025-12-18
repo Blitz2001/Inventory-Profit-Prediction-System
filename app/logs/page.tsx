@@ -23,7 +23,9 @@ export default function LogsPage() {
             .from('activity_logs')
             .select(`
                 *,
-                inventory ( gem_type )
+                *,
+                inventory ( gem_type ),
+                capital_investments ( amount, nickname, profiles ( full_name ) )
             `)
             .order('created_at', { ascending: false })
             .limit(200)
@@ -38,6 +40,7 @@ export default function LogsPage() {
 
     const filteredLogs = logs.filter(log => {
         const matchesSearch = (log.inventory?.gem_type || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (log.capital_investments?.nickname || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
             (log.note || '').toLowerCase().includes(searchTerm.toLowerCase())
 
         const matchesFilter = filterAction === 'ALL' || log.action_type === filterAction
@@ -120,12 +123,14 @@ export default function LogsPage() {
                                                 {log.action_type}
                                             </Badge>
                                             <div className="text-xs text-white/40 mt-1 font-medium">
-                                                {log.inventory?.gem_type || 'Unknown Item'}
+                                                {log.inventory?.gem_type || (log.capital_investments ? 'Capital Investment' : 'Unknown Item')}
                                             </div>
                                         </td>
                                         <td className="p-4">
                                             {log.action_type === 'CREATE' ? (
-                                                <span className="text-white/40 italic">Created new item</span>
+                                                <span className="text-white/40 italic">
+                                                    {log.capital_investments ? `Invested Rs ${log.capital_investments.amount?.toLocaleString()}` : 'Created new item'}
+                                                </span>
                                             ) : (
                                                 <div className="flex flex-wrap items-center gap-2">
                                                     <span className="font-mono text-xs text-red-200 bg-red-500/20 px-1.5 py-0.5 rounded border border-red-500/30">
